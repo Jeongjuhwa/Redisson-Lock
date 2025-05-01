@@ -91,4 +91,28 @@ public class ProductsServiceTest {
         assertThat(persistProduct.getStock()).isEqualTo(0);
     }
 
+    @Test
+    void 재고차감_분산락_AOP_적용_10명_테스트() throws InterruptedException {
+        int numberOfThreads = 10;
+        ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
+        CountDownLatch countDownLatch = new CountDownLatch(numberOfThreads);
+
+        for (int i = 0; i < numberOfThreads; i++) {
+            executorService.submit(() -> {
+                try {
+                    productsService.decreaseWithLockAop(products.getId() + ":product",
+                        products.getId(), 2);
+                } finally {
+                    countDownLatch.countDown();
+                }
+            });
+        }
+
+        countDownLatch.await();
+
+        Products persistProduct = productsRepository.findById(products.getId())
+            .orElseThrow(RuntimeException::new);
+        assertThat(persistProduct.getStock()).isEqualTo(0);
+    }
+
 }

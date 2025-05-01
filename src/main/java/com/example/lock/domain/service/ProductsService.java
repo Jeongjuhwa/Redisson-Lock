@@ -1,5 +1,6 @@
 package com.example.lock.domain.service;
 
+import com.example.lock.aop.annotation.DistributedLock;
 import com.example.lock.domain.dto.ProductsDTO;
 import com.example.lock.domain.entity.Products;
 import com.example.lock.domain.repository.ProductsRepository;
@@ -12,13 +13,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ProductsService {
 
     private final ProductsRepository productsRepository;
     private final RedissonClient redissonClient;
 
     // 락 없이
+    @Transactional
     public void decrease(Long productId, int stock) {
         Products products = productsRepository.findById(productId)
             .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
@@ -26,6 +27,7 @@ public class ProductsService {
     }
 
     // 락 존재
+    @Transactional
     public void decreaseWithLock(Long productId, int stock) {
         String lockKey = String.valueOf(productId).concat(":product");
         RLock rLock = redissonClient.getLock(lockKey);
@@ -48,6 +50,14 @@ public class ProductsService {
             }
         }
 
+    }
+
+    // 트랜잭션 어노테이션 존재 x
+    @DistributedLock(key = "#lockKey")
+    public void decreaseWithLockAop(String lockKey, Long productId, int stock) {
+        Products products = productsRepository.findById(productId)
+            .orElseThrow(RuntimeException::new);
+        products.decreaseStock(stock);
     }
 
 
