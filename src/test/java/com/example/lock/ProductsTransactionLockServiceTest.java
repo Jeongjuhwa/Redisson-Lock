@@ -37,7 +37,7 @@ public class ProductsTransactionLockServiceTest {
     }
 
     @Test
-    void 재고감소_트랜잭션_락_미적용_동시_10개_테스트() throws InterruptedException {
+    void 재고감소_트랜잭션_락_미적용_동시_테스트() throws InterruptedException {
         int numberOfThreads = 2;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
         CountDownLatch countDownLatch = new CountDownLatch(numberOfThreads);
@@ -62,7 +62,7 @@ public class ProductsTransactionLockServiceTest {
     }
 
     @Test
-    void 재고감소_트랜잭션_락_적용_동시_10개_테스트() throws InterruptedException {
+    void 재고감소_트랜잭션_락_적용_동시_테스트() throws InterruptedException {
         int numberOfThreads = 2;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
         CountDownLatch countDownLatch = new CountDownLatch(numberOfThreads);
