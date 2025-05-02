@@ -2,10 +2,9 @@ package com.example.lock;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.config.EmbeddedRedisConfig;
 import com.example.lock.domain.entity.Products;
 import com.example.lock.domain.repository.ProductsRepository;
-import com.example.lock.domain.service.ProductsService;
+import com.example.lock.domain.service.ProductsRedissionLockService;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,10 +27,10 @@ import org.springframework.test.context.TestPropertySource;
     "spring.data.redis.password=",
     "spring.data.redis.timeout=60000"
 })
-public class ProductsServiceTest {
+public class ProductsRedissionLockServiceTest {
 
     @Autowired
-    private ProductsService productsService;
+    private ProductsRedissionLockService productsRedissionLockService;
     @Autowired
     private ProductsRepository productsRepository;
 
@@ -53,7 +52,7 @@ public class ProductsServiceTest {
         for (int i = 0; i < numberOfThreads; i++) {
             executorService.submit(() -> {
                 try {
-                    productsService.decrease(products.getId(), 2);
+                    productsRedissionLockService.decrease(products.getId(), 2);
                 } finally {
                     countDownLatch.countDown();
                 }
@@ -77,7 +76,7 @@ public class ProductsServiceTest {
         for (int i = 0; i < numberOfThreads; i++) {
             executorService.submit(() -> {
                 try {
-                    productsService.decreaseWithLock(products.getId(), 2);
+                    productsRedissionLockService.decreaseWithLock(products.getId(), 2);
                 } finally {
                     countDownLatch.countDown();
                 }
@@ -100,7 +99,7 @@ public class ProductsServiceTest {
         for (int i = 0; i < numberOfThreads; i++) {
             executorService.submit(() -> {
                 try {
-                    productsService.decreaseWithLockAop(products.getId() + ":product",
+                    productsRedissionLockService.decreaseWithLockAop(products.getId() + ":product",
                         products.getId(), 2);
                 } finally {
                     countDownLatch.countDown();

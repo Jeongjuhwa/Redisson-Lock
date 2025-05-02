@@ -1,7 +1,6 @@
 package com.example.lock.domain.service;
 
 import com.example.lock.aop.annotation.DistributedLock;
-import com.example.lock.domain.dto.ProductsDTO;
 import com.example.lock.domain.entity.Products;
 import com.example.lock.domain.repository.ProductsRepository;
 import jakarta.transaction.Transactional;
@@ -13,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ProductsService {
+public class ProductsRedissionLockService {
 
     private final ProductsRepository productsRepository;
     private final RedissonClient redissonClient;
